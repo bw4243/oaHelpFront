@@ -90,9 +90,9 @@ export function Sidebar() {
           </div>
           <div>
             <h2 className="text-xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-              泛微OA管理
+              办公协同运维平台
             </h2>
-            <p className="text-xs text-slate-400">管理运维平台</p>
+            
           </div>
         </div>
       </div>

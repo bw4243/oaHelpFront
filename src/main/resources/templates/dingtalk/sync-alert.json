@@ -1,0 +1,10 @@
+{
+  "msgtype": "markdown",
+  "markdown": {
+    "title": "OA系统数据同步失败告警",
+    "text": "### OA系统数据同步失败告警\n\n**系统信息**\n\n- 系统名称：${systemName}\n- 系统描述：${systemDescription}\n- 同步类型：${syncType}\n- 数据源：${dataSource}\n\n**失败信息**\n\n- 失败时间：${failureTime}\n- 失败原因：${failureReason}\n- 详细信息：${failureDetails}\n- 连续失败次数：${consecutiveFailures}\n\n> [查看详情](${systemUrl})"
+  },
+  "at": {
+    "isAtAll": true
+  }
+}

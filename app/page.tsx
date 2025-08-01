@@ -56,7 +56,8 @@ export default function Dashboard() {
           </div>
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-              泛微OA管理中心
+              办公协同运维平台
+
             </h1>
             <p className="text-lg text-gray-600 mt-2">系统运行状态总览</p>
           </div>

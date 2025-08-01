@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据同步失败告警</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(to right, #f05545, #e53935);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        .system-info {
+            background-color: #fff;
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .failure-info {
+            background-color: #fff3f3;
+            border: 1px solid #ffcdd2;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        table td:first-child {
+            font-weight: bold;
+            width: 30%;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(to right, #1976d2, #2196f3);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>数据同步失败告警</h2>
+    </div>
+    <div class="content">
+        <p>您好，</p>
+        <p>系统检测到以下数据同步任务执行失败，请及时处理：</p>
+        
+        <div class="system-info">
+            <h3>系统信息</h3>
+            <table>
+                <tr>
+                    <td>系统名称</td>
+                    <td>${systemName}</td>
+                </tr>
+                <tr>
+                    <td>系统描述</td>
+                    <td>${systemDescription}</td>
+                </tr>
+                <tr>
+                    <td>同步类型</td>
+                    <td>${syncType}</td>
+                </tr>
+                <tr>
+                    <td>数据源</td>
+                    <td>${dataSource}</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="failure-info">
+            <h3>失败信息</h3>
+            <table>
+                <tr>
+                    <td>失败时间</td>
+                    <td>${failureTime}</td>
+                </tr>
+                <tr>
+                    <td>失败原因</td>
+                    <td>${failureReason}</td>
+                </tr>
+                <tr>
+                    <td>详细信息</td>
+                    <td>${failureDetails}</td>
+                </tr>
+                <tr>
+                    <td>连续失败次数</td>
+                    <td>${consecutiveFailures}</td>
+                </tr>
+            </table>
+        </div>
+        
+        <p>请登录OA系统查看详细信息并处理：</p>
+        <a href="${systemUrl}" class="button">查看详情</a>
+        
+        <div class="footer">
+            <p>此邮件由系统自动发送，请勿直接回复。</p>
+            <p>© ${currentYear} 公司名称 - OA系统</p>
+        </div>
+    </div>
+</body>
+</html>
