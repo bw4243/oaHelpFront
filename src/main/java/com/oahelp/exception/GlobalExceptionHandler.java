@@ -1,54 +1,39 @@
 package com.oahelp.exception;
 
-import com.oahelp.payload.ApiResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.io.IOException;
+import com.oahelp.dto.ApiResponseDTO;
 
 /**
- * 全局异常处理类
+ * 全局异常处理器
  */
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
-
+    
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    
     /**
-     * 处理资源未找到异常
+     * 处理业务异常
      */
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
-        ApiResponse apiResponse = new ApiResponse(false, ex.getMessage());
-        return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
+    @ExceptionHandler(BusinessException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponseDTO<Void> handleBusinessException(BusinessException e) {
+        logger.warn("业务异常: {}", e.getMessage());
+        return ApiResponseDTO.error(e.getMessage());
     }
-
+    
     /**
-     * 处理访问拒绝异常
-     */
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ApiResponse> handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
-        ApiResponse apiResponse = new ApiResponse(false, "没有权限执行此操作");
-        return new ResponseEntity<>(apiResponse, HttpStatus.FORBIDDEN);
-    }
-
-    /**
-     * 处理IO异常
-     */
-    @ExceptionHandler(IOException.class)
-    public ResponseEntity<ApiResponse> handleIOException(IOException ex, WebRequest request) {
-        ApiResponse apiResponse = new ApiResponse(false, "文件操作失败: " + ex.getMessage());
-        return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    /**
-     * 处理其他所有异常
+     * 处理其他未知异常
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse> handleGlobalException(Exception ex, WebRequest request) {
-        ApiResponse apiResponse = new ApiResponse(false, "发生错误: " + ex.getMessage());
-        return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiResponseDTO<Void> handleException(Exception e) {
+        logger.error("系统异常", e);
+        return ApiResponseDTO.error("系统异常，请联系管理员");
     }
 }

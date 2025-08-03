@@ -1,184 +1,105 @@
 package com.oahelp.config;
 
-import com.oahelp.entity.AlertConfig;
-import com.oahelp.entity.SyncSystem;
-import com.oahelp.entity.SyncTrend;
-import com.oahelp.repository.AlertConfigRepository;
-import com.oahelp.repository.SyncSystemRepository;
-import com.oahelp.repository.SyncTrendRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.Random;
+import com.oahelp.entity.VirtualAccount;
+import com.oahelp.repository.VirtualAccountRepository;
 
 /**
  * 数据初始化配置
- * 仅在开发环境中启用
  */
-@Slf4j
 @Configuration
-@RequiredArgsConstructor
-@Profile({"dev", "test"})
 public class DataInitializer {
-
-    private final SyncSystemRepository syncSystemRepository;
-    private final SyncTrendRepository syncTrendRepository;
-    private final AlertConfigRepository alertConfigRepository;
-    private final Random random = new Random();
-
+    
+    @Autowired
+    private VirtualAccountRepository virtualAccountRepository;
+    
+    /**
+     * 初始化虚拟账号测试数据
+     */
     @Bean
-    public CommandLineRunner initSyncData() {
+    @Profile("dev")
+    public CommandLineRunner initVirtualAccountData() {
         return args -> {
-            log.info("初始化同步系统数据...");
-            
-            // 初始化同步系统
-            if (syncSystemRepository.count() == 0) {
-                initSyncSystems();
+            // 检查是否已有数据
+            if (virtualAccountRepository.count() > 0) {
+                return;
             }
             
-            // 初始化趋势数据
-            if (syncTrendRepository.count() == 0) {
-                initTrendData();
-            }
+            // 创建测试数据
+            List<VirtualAccount> accounts = Arrays.asList(
+                createAccount("test_user_001", "测试用户001", "技术部", 
+                        LocalDateTime.now().minusDays(120), 
+                        LocalDateTime.now().minusDays(27), 5, 
+                        "接口生成", "AD域同步接口", "中", "启用", 
+                        "test001@company.com", "系统接口"),
+                        
+                createAccount("temp_admin_002", "临时管理员002", "IT部", 
+                        LocalDateTime.now().minusDays(180), 
+                        LocalDateTime.now().minusDays(47), 2, 
+                        "手动创建", "管理员手动创建", "高", "启用", 
+                        "temp002@company.com", "张管理员"),
+                        
+                createAccount("service_account_003", "服务账号003", "系统服务", 
+                        LocalDateTime.now().minusDays(90), 
+                        null, 0, 
+                        "接口生成", "自动化脚本创建", "高", "启用", 
+                        "service003@company.com", "自动化系统"),
+                        
+                createAccount("guest_user_004", "访客用户004", "外部访客", 
+                        LocalDateTime.now().minusDays(60), 
+                        LocalDateTime.now().minusDays(6), 12, 
+                        "手动创建", "前台手动创建", "低", "启用", 
+                        "guest004@company.com", "前台接待"),
+                        
+                createAccount("backup_admin_005", "备份管理员005", "IT部", 
+                        LocalDateTime.now().minusDays(150), 
+                        LocalDateTime.now().minusDays(93), 1, 
+                        "接口生成", "备份系统接口", "高", "启用", 
+                        "backup005@company.com", "备份系统"),
+                        
+                createAccount("demo_user_006", "演示用户006", "市场部", 
+                        LocalDateTime.now().minusDays(50), 
+                        LocalDateTime.now().minusDays(22), 8, 
+                        "手动创建", "演示需要创建", "中", "启用", 
+                        "demo006@company.com", "市场经理")
+            );
             
-            // 初始化告警配置
-            if (alertConfigRepository.count() == 0) {
-                initAlertConfig();
-            }
-            
-            log.info("同步系统数据初始化完成");
+            // 保存测试数据
+            virtualAccountRepository.saveAll(accounts);
+            System.out.println("已初始化虚拟账号测试数据");
         };
     }
     
     /**
-     * 初始化同步系统
+     * 创建虚拟账号
      */
-    private void initSyncSystems() {
-        // AD域同步
-        SyncSystem adSync = SyncSystem.builder()
-                .id("ad")
-                .name("AD域同步")
-                .description("Active Directory用户和组织架构同步")
-                .status("running")
-                .lastSyncTime(LocalDateTime.now().minusMinutes(30))
-                .nextSyncTime(LocalDateTime.now().plusMinutes(30))
-                .syncInterval("1小时")
-                .successCount(1247)
-                .failureCount(3)
-                .avgDuration("2.3秒")
-                .lastFailureReason("连接超时")
-                .lastFailureTime(LocalDateTime.now().minusHours(2).minusMinutes(15))
-                .enabled(true)
-                .syncType("增量同步")
-                .dataSource("ldap://ad.company.com:389")
-                .build();
-        
-        // ERP系统同步
-        SyncSystem erpSync = SyncSystem.builder()
-                .id("erp")
-                .name("ERP系统同步")
-                .description("ERP系统员工信息和部门数据同步")
-                .status("success")
-                .lastSyncTime(LocalDateTime.now().minusHours(1))
-                .nextSyncTime(LocalDateTime.now().plusHours(23))
-                .syncInterval("每日")
-                .successCount(892)
-                .failureCount(1)
-                .avgDuration("15.6秒")
-                .lastFailureReason("数据格式错误")
-                .lastFailureTime(LocalDateTime.now().minusDays(1).minusHours(16))
-                .enabled(true)
-                .syncType("全量同步")
-                .dataSource("http://erp.company.com/api/sync")
-                .build();
-        
-        // HR系统同步
-        SyncSystem hrSync = SyncSystem.builder()
-                .id("hr")
-                .name("HR系统同步")
-                .description("人力资源系统员工档案同步")
-                .status("failed")
-                .lastSyncTime(LocalDateTime.now().minusMinutes(15))
-                .nextSyncTime(LocalDateTime.now().plusMinutes(45))
-                .syncInterval("1小时")
-                .successCount(654)
-                .failureCount(8)
-                .avgDuration("8.9秒")
-                .lastFailureReason("API认证失败")
-                .lastFailureTime(LocalDateTime.now().minusMinutes(15))
-                .enabled(true)
-                .syncType("增量同步")
-                .dataSource("https://hr.company.com/api/v2/sync")
-                .build();
-        
-        // CRM系统同步
-        SyncSystem crmSync = SyncSystem.builder()
-                .id("crm")
-                .name("CRM系统同步")
-                .description("客户关系管理系统数据同步")
-                .status("stopped")
-                .lastSyncTime(LocalDateTime.now().minusHours(4).minusMinutes(30))
-                .nextSyncTime(null)
-                .syncInterval("4小时")
-                .successCount(423)
-                .failureCount(2)
-                .avgDuration("5.2秒")
-                .lastFailureReason("无")
-                .lastFailureTime(LocalDateTime.now().minusDays(1).minusHours(9).minusMinutes(30))
-                .enabled(false)
-                .syncType("增量同步")
-                .dataSource("http://crm.company.com/sync")
-                .build();
-        
-        syncSystemRepository.saveAll(Arrays.asList(adSync, erpSync, hrSync, crmSync));
-    }
-    
-    /**
-     * 初始化趋势数据
-     */
-    private void initTrendData() {
-        LocalDate today = LocalDate.now();
-        
-        // 生成今天每小时的趋势数据
-        for (int hour = 8; hour <= 17; hour++) {
-            String hourKey = String.format("%02d:00", hour);
-            LocalDateTime time = today.atTime(hour, 0);
-            
-            // 生成随机的成功和失败次数
-            int success = 30 + random.nextInt(40); // 30-70
-            int failure = random.nextInt(4);       // 0-3
-            
-            SyncTrend trend = SyncTrend.builder()
-                    .time(time)
-                    .hourKey(hourKey)
-                    .success(success)
-                    .failure(failure)
-                    .build();
-            
-            syncTrendRepository.save(trend);
-        }
-    }
-    
-    /**
-     * 初始化告警配置
-     */
-    private void initAlertConfig() {
-        AlertConfig config = AlertConfig.builder()
-                .failureThreshold(3)
-                .emailEnabled(true)
-                .dingTalkEnabled(false)
-                .emailRecipients("admin@company.com,it@company.com")
-                .dingTalkWebhook("")
-                .build();
-        
-        alertConfigRepository.save(config);
+    private VirtualAccount createAccount(String username, String displayName, String department, 
+                                        LocalDateTime createTime, LocalDateTime lastLoginTime, 
+                                        int loginCount, String source, String sourceDetail, 
+                                        String riskLevel, String status, String email, String creator) {
+        VirtualAccount account = new VirtualAccount();
+        account.setUsername(username);
+        account.setDisplayName(displayName);
+        account.setDepartment(department);
+        account.setCreateTime(createTime);
+        account.setLastLoginTime(lastLoginTime);
+        account.setLoginCount(loginCount);
+        account.setSource(source);
+        account.setSourceDetail(sourceDetail);
+        account.setRiskLevel(riskLevel);
+        account.setStatus(status);
+        account.setEmail(email);
+        account.setCreator(creator);
+        account.updateUsageFrequency();
+        return account;
     }
 }
